@@ -1,4 +1,0 @@
-/home/roland/Documents/marelle/gnmm-0.1.2
-/home/roland/Documents/marelle/merelles
-/home/roland/Documents/marelle/morris-0.4
-/home/roland/Documents/marelle/muehle

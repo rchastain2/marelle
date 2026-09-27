@@ -123,7 +123,7 @@ Avec la graine fixe, `logtest.log` sert aussi de référence : un `diff` entre d
 
 ## Comparaison avec d'autres programmes
 
-Les programmes comparés sont ceux listés dans `autres-programmes.txt` : merelles (C/SDL), morris-0.4 (C++/GTK), gnmm-0.1.2 (C++/GNOME) et muehle (FreeBASIC).
+Les programmes comparés sont : *merelles* (C/SDL), *morris-0.4* (C++/GTK), *gnmm-0.1.2* (C++/GNOME) et *muehle* (FreeBASIC).
 
 ### Représentation du plateau (couche logique)
 

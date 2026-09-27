@@ -144,7 +144,7 @@ options=131
  index=0
  [projectoptionsfo.tabwidget]
  firsttab=0
- index=3
+ index=2
  [projectoptionsfo]
  stackedunder=
  x=205
@@ -256,9 +256,7 @@ mainfile=marelle.pas
 targetfile=marelle${EXEEXT}
 makecommand=${COMPILER}
 makedir=
-unitdirs=6
- ../skins/$SKIN
- ${MSEDIR}apps/ide
+unitdirs=4
  ${MSEDIR}lib/addon/*/
  ${MSELIBDIR}kernel/$TARGETOSDIR/
  ${MSELIBDIR}kernel/
@@ -288,9 +286,7 @@ makeoptionson=4
  34
  32
 aftcommandon=0
-unitdirson=6
- 983103
- 983103
+unitdirson=4
  196671
  65599
  196671
@@ -597,7 +593,7 @@ finddtext=
 findhistory=0
 findoptions=1
 editpos=2
- 0,0
+ 0,-1073741823
  0,0
 bookmarks0=0
 bookmarks1=0
@@ -661,21 +657,21 @@ windowlayout=568
  [mainfo]
  splitdir=0
  useroptions=301990011
- stackedunder=mainfo.panel2
+ stackedunder=objectinspectorfo
  parent=
  mdistate=0
  nx=0
  ny=0
  ncx=0
  ncy=0
- x=4
- y=28
+ x=80
+ y=42
  cx=323
  cy=64
  rcx=0
  rcy=0
  wsize=0
- active=1
+ active=0
  visible=1
  [targetconsolefo]
  splitdir=0
@@ -743,7 +739,7 @@ windowlayout=568
  [disassfo]
  splitdir=0
  useroptions=268451947
- stackedunder=
+ stackedunder=mainfo
  parent=
  mdistate=0
  nx=0
@@ -762,7 +758,7 @@ windowlayout=568
  [findinfilefo]
  splitdir=0
  useroptions=268451947
- stackedunder=mainfo
+ stackedunder=disassfo
  parent=
  mdistate=0
  nx=0
@@ -888,20 +884,20 @@ windowlayout=568
  ny=0
  ncx=0
  ncy=0
- x=724
- y=157
- cx=296
- cy=566
+ x=999
+ y=50
+ cx=341
+ cy=663
  rcx=0
  rcy=0
  wsize=0
  active=0
  visible=1
  [objectinspectorfo.grid]
- propcolwidthref=286
- width0=105
+ propcolwidthref=331
+ width0=122
  sortdescend0=0
- width1=175
+ width1=203
  sortdescend1=0
  [symbolfo]
  splitdir=0
@@ -990,7 +986,7 @@ windowlayout=568
  ncx=0
  ncy=0
  x=0
- y=510
+ y=475
  cx=675
  cy=95
  rcx=0
@@ -1061,22 +1057,22 @@ windowlayout=568
  [componentpalettefo]
  splitdir=0
  useroptions=268460139
- stackedunder=mainfo.panel1
+ stackedunder=
  parent=
  mdistate=0
  nx=0
  ny=0
  ncx=0
  ncy=0
- x=121
- y=182
+ x=668
+ y=44
  cx=685
  cy=103
  rcx=0
  rcy=0
  wsize=0
  active=0
- visible=1
+ visible=0
  [componentpalettefo.componentpages]
  activetab=0
  [debuggerfo]
@@ -1108,7 +1104,7 @@ windowlayout=568
  x=0
  y=0
  cx=675
- cy=507
+ cy=472
  rcx=0
  rcy=0
  [actionsmo.watchesonact]
@@ -1138,26 +1134,26 @@ windowlayout=568
  [mainfo.panel1]
  splitdir=2
  useroptions=302022123
- stackedunder=objectinspectorfo
+ stackedunder=
  parent=
  mdistate=0
  nx=0
  ny=0
  ncx=0
  ncy=0
- x=4
- y=118
+ x=19
+ y=145
  cx=685
- cy=605
+ cy=570
  rcx=0
  rcy=0
  wsize=0
- active=0
+ active=1
  visible=1
  [mainfo.panel2]
  splitdir=2
  useroptions=302022123
- stackedunder=componentpalettefo
+ stackedunder=
  parent=
  mdistate=0
  nx=0
@@ -1172,21 +1168,21 @@ windowlayout=568
  rcy=0
  wsize=0
  active=0
- visible=1
+ visible=0
  [_mse_mainfo_mse_]
  splitdir=0
  useroptions=268451963
- stackedunder=
+ stackedunder=mainfo.panel1
  parent=
  mdistate=3
  nx=0
  ny=0
  ncx=0
  ncy=0
- x=100
- y=100
+ x=448
+ y=105
  cx=538
- cy=579
+ cy=585
  rcx=0
  rcy=0
  wsize=0
