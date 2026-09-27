@@ -5,18 +5,18 @@ Les programmes comparés sont :
 
 - [Mérelles](https://codeberg.org/rchastain/merelles) (C/SDL)
 - [Morris 0.4](https://github.com/farindk/morris) (C++/GTK)
-- *Morris 0.1.2* (C++/GNOME)
+- [Morris 0.1.2](https://sourceforge.net/projects/gnmm/) (C++/GNOME)
 - [Mühlespiel](https://forum.qbasic.at/viewtopic.php?t=8708) (FreeBASIC)
 
-## Représentation du plateau (couche logique)
+## Représentation du plateau
 
 | Programme | Numérotation des 24 points | Contenu d'une case | Moulins | Voisins |
 |---|---|---|---|---|
-| **Marelle** | ligne par ligne (0-1-2 en haut, 21-22-23 en bas) | `0` / `1` / `2` | `lines[24][4]` : deux paires par point | `neighbours[24][4]`, complété par `-1` |
-| **Mérelles** | identique | `0` / `1` / `2` (`int *field`) | `field_lines[96]` : mêmes valeurs | `field_moves[96]` : mêmes valeurs |
-| **Morris 0.4** | identique | `0` / `+1` / `-1` (`PL_White`, `PL_Black`) | liste des 16 moulins (`MM_9_milltab_short`), convertie en « moulins passant par chaque point » | `MM_9_neighbour` : mêmes valeurs |
-| **Morris 0.1.2** | par carré : 0-7 extérieur, 8-15 milieu, 16-23 intérieur, dans le sens horaire depuis le coin en haut à gauche | `0` / `+1` / `-1` | 16 moulins (`milltab_short`) convertis au démarrage en `milltab[24][2][2]` | `neighbour[24][4]` |
-| **Mühlespiel** | par carré, comme *Morris 0.1.2* | deux bitboards de 24 bits (`BF_Brett(0)` pour les Blancs, `BF_Brett(1)` pour les Noirs) | 16 masques de bits (`Tripletts`), et pour chaque point les indices de ses deux moulins | masque de bits, plus un voisin par direction (haut, droite, bas, gauche), lus dans des fichiers CSV |
+| *Marelle* | ligne par ligne (0-1-2 en haut, 21-22-23 en bas) | `0` / `1` / `2` | `lines[24][4]` : deux paires par point | `neighbours[24][4]`, complété par `-1` |
+| *Mérelles* | identique | `0` / `1` / `2` (`int *field`) | `field_lines[96]` : mêmes valeurs | `field_moves[96]` : mêmes valeurs |
+| *Morris 0.4* | identique | `0` / `+1` / `-1` (`PL_White`, `PL_Black`) | liste des 16 moulins (`MM_9_milltab_short`), convertie en « moulins passant par chaque point » | `MM_9_neighbour` : mêmes valeurs |
+| *Morris 0.1.2* | par carré : 0-7 extérieur, 8-15 milieu, 16-23 intérieur, dans le sens horaire depuis le coin en haut à gauche | `0` / `+1` / `-1` | 16 moulins (`milltab_short`) convertis au démarrage en `milltab[24][2][2]` | `neighbour[24][4]` |
+| *Mühlespiel* | par carré, comme *Morris 0.1.2* | deux bitboards de 24 bits (`BF_Brett(0)` pour les Blancs, `BF_Brett(1)` pour les Noirs) | 16 masques de bits (`Tripletts`), et pour chaque point les indices de ses deux moulins | masque de bits, plus un voisin par direction (haut, droite, bas, gauche), lus dans des fichiers CSV |
 
 Numérotation par carré (*Morris 0.1.2* et *Mühlespiel*) :
 
