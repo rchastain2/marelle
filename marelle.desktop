@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Marelle
+Comment=Jeu du moulin (mérelles)
+Exec=/home/roland/Documents/pascal/msegui/marelle/marelle
+Path=/home/roland/Documents/pascal/msegui/marelle
+Icon=/home/roland/Documents/pascal/msegui/marelle/images/icone128.png
+Terminal=false
+Categories=Game;BoardGame;

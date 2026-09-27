@@ -1,0 +1,6 @@
+
+*.bak
+*.bak?
+*.log
+*.o
+*.ppu
