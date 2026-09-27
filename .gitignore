@@ -4,3 +4,5 @@
 *.log
 *.o
 *.ppu
+
+mseide-msegui/

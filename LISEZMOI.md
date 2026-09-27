@@ -1,15 +1,20 @@
+
 # Marelle
 
-Jeu de la marelle (ou des mérelles, ou des moulins) pour MSEide+MSEgui.
+Jeu de la marelle (ou des mérelles, ou des moulins) pour *MSEide+MSEgui*.
+
+La logique du jeu est empruntée au programme [Mérelles](https://codeberg.org/rchastain/merelles) de [paul-maxime](https://github.com/paul-maxime/merreles).
+
+La règle pour la capture des pions compris dans des moulins provient du programme  [Morris](https://github.com/farindk/morris) de Dirk Farin.
 
 ## Représentation du plateau
 
-Le plateau est représenté dans `game.pas`, qui ne connaît aucune coordonnée à l'écran.
+Le plateau est représenté dans `game.pas`.
 
 ### Les 24 intersections dans un tableau à une dimension
 
 ```pascal
-fpoints: array[0..pointcount - 1] of integer;   // pointcount = 24
+fpoints: array[0..pointcount - 1] of integer; // pointcount = 24
 ```
 
 Chaque case contient **0** si l'intersection est vide, **1** pour un pion des Blancs et **2** pour un pion des Noirs. Les numéros de joueur sont les mêmes que dans `fplayer`, ce qui permet d'écrire `3 - fplayer` pour passer d'un joueur à l'autre.
@@ -48,7 +53,7 @@ Le tableau `fpoints` ne sait rien de la forme du plateau. La géométrie est dé
 
 ### Représentation cubique
 
-Une autre façon de voir le plateau a été proposée sur [developpez.net](https://www.developpez.net/forums/d2089226/autres-langages/pascal/representation-jeu-moulin/#post11949548) : les trois carrés sont les trois couches d'un cube de 3 × 3 × 3 cases, vu de dessus. Chaque point reçoit trois coordonnées comprises entre -1 et 1 : `z` désigne le carré (-1 intérieur, 0 milieu, 1 extérieur), `x` et `y` la position sur ce carré. Les trois centres (`x = y = 0`) ne sont pas utilisés, ce qui laisse les 24 points.
+Une autre façon de voir le plateau a été proposée par [Philippe Guesset](https://www.developpez.net/forums/d2089226/autres-langages/pascal/representation-jeu-moulin/#post11949548) : les trois carrés sont les trois couches d'un cube de 3 × 3 × 3 cases, vu de dessus. Chaque point reçoit trois coordonnées comprises entre -1 et 1 : `z` désigne le carré (-1 intérieur, 0 milieu, 1 extérieur), `x` et `y` la position sur ce carré. Les trois centres (`x = y = 0`) ne sont pas utilisés, ce qui laisse les 24 points.
 
 La géométrie se déduit alors des coordonnées :
 
@@ -56,7 +61,7 @@ La géométrie se déduit alors des coordonnées :
 - **moulins** : les trois points d'une ligne du cube, sauf les lignes qui passent par un centre et les lignes selon `z` qui passent par les coins. On retrouve les 16 moulins ;
 - **position à l'écran**, sur la grille 7 × 7 : `4 + x * (z + 2)`, `4 + y * (z + 2)`.
 
-Le programme du dossier `factory` calcule ainsi les tables `neighbours` et `lines` de `game.pas`, et la table `coords` de `main.pas` : il retrouve les mêmes données. Le même dossier dessine le cube, en SVG et avec TikZ.
+Le programme du dossier `factory` calcule ainsi les tables `neighbours` et `lines` de `game.pas`, et la table `coords` de `main.pas`.
 
 ## Implémenter un adversaire artificiel
 
@@ -120,55 +125,3 @@ Les clics sont déjà ignorés pendant le tour de l'ordinateur (`mouseev` teste 
 Le dossier `test` contient `logtest`, qui fait jouer une partie entière à l'ordinateur contre lui-même, avec une graine du hasard fixe. Sur ce modèle, un programme de match peut faire jouer le nouvel adversaire contre l'ancien (le hasard) sur une centaine de parties, en alternant les couleurs, et compter les victoires, les défaites et les parties arrêtées au bout d'un nombre maximal de coups. Pour que ce soit rapide, il faudra pouvoir couper l'écriture du journal (par exemple avec une variable de `log.pas`).
 
 Avec la graine fixe, `logtest.log` sert aussi de référence : un `diff` entre deux versions (en ignorant l'horodatage, par exemple avec `cut -c14-`) montre tout de suite si le déroulement d'une partie a changé.
-
-## Comparaison avec d'autres programmes
-
-Les programmes comparés sont : *merelles* (C/SDL), *morris-0.4* (C++/GTK), *gnmm-0.1.2* (C++/GNOME) et *muehle* (FreeBASIC).
-
-### Représentation du plateau (couche logique)
-
-| Programme | Numérotation des 24 points | Contenu d'une case | Moulins | Voisins |
-|---|---|---|---|---|
-| **marelle** | ligne par ligne (0-1-2 en haut, 21-22-23 en bas) | `0` / `1` / `2` | `lines[24][4]` : deux paires par point | `neighbours[24][4]`, complété par `-1` |
-| **merelles** | identique | `0` / `1` / `2` (`int *field`) | `field_lines[96]` : mêmes valeurs | `field_moves[96]` : mêmes valeurs |
-| **morris-0.4** | identique | `0` / `+1` / `-1` (`PL_White`, `PL_Black`) | liste des 16 moulins (`MM_9_milltab_short`), convertie en « moulins passant par chaque point » | `MM_9_neighbour` : mêmes valeurs |
-| **gnmm-0.1.2** | par carré : 0-7 extérieur, 8-15 milieu, 16-23 intérieur, dans le sens horaire depuis le coin en haut à gauche | `0` / `+1` / `-1` | 16 moulins (`milltab_short`) convertis au démarrage en `milltab[24][2][2]` | `neighbour[24][4]` |
-| **muehle** | par carré, comme gnmm | deux bitboards de 24 bits (`BF_Brett(0)` pour les Blancs, `BF_Brett(1)` pour les Noirs) | 16 masques de bits (`Tripletts`), et pour chaque point les indices de ses deux moulins | masque de bits, plus un voisin par direction (haut, droite, bas, gauche), lus dans des fichiers CSV |
-
-Numérotation par carré (gnmm et muehle) :
-
-```
- 0-----------1-----------2
- |           |           |
- |   8-------9------10   |
- |   |       |       |   |
- |   |  16--17--18   |   |
- |   |   |       |   |   |
- 7--15--23      19--11---3
- |   |   |       |   |   |
- |   |  22--21--20   |   |
- |   |       |       |   |
- |  14------13------12   |
- |           |           |
- 6-----------5-----------4
-```
-
-Remarques :
-
-- Les tables `lines` et `neighbours` de marelle sont identiques, valeur pour valeur, à celles de merelles. La table des voisins de morris est aussi la même.
-- Avec `+1` et `-1`, gnmm et morris obtiennent l'adversaire par `-joueur`. marelle utilise `3 - joueur` pour la même chose.
-- Dans la numérotation par carré, chaque point s'écrit `carré*8 + position`. gnmm s'en sert pour sa notation des coups (lettre = `n>>3`, chiffre = `n&7`).
-- muehle ne garde pas le nombre de pions en réserve. Il ne stocke que le numéro du demi-coup (`Halbzug`) et en déduit la phase : la pose dure jusqu'au demi-coup 18 ; ensuite, avec 3 pions, le joueur peut sauter.
-
-### Règles du jeu
-
-Les règles de base sont communes aux cinq programmes : 9 pions par joueur, pose puis déplacement vers un point voisin, saut libre à 3 pions, retrait d'un pion adverse quand on forme un moulin, défaite avec moins de 3 pions ou quand on ne peut plus bouger. Les différences :
-
-| Règle | marelle | merelles | gnmm | morris (règle standard) | muehle |
-|---|---|---|---|---|---|
-| Un pion dans un moulin est protégé (sauf si tous les pions adverses sont dans des moulins) | oui | non : on peut prendre n'importe quel pion adverse (`phase_del.c`) | oui | oui (on peut le désactiver par une option) | oui |
-| Double moulin | 1 pion retiré | 1 pion | 1 pion | 1 pion (plusieurs par une option) | 2 pions retirés |
-| Partie nulle | non | non | non | oui, si la même position revient 3 fois | non |
-| Variantes | non | non | non | oui : Lasker, Morabaraba, 6 et 12 pions, Windmill, etc. | non |
-
-Pour le saut et la défaite, tous ces programmes se comportent en pratique de la même façon. La principale différence avec marelle se trouve donc dans merelles, qui ne protège pas les pions déjà dans un moulin.

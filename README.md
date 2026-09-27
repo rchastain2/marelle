@@ -1,8 +1,11 @@
+
 # Marelle
 
-*MSEgui* implementation of [Nine Men's Morris](https://en.wikipedia.org/wiki/Nine_men%27s_morris) (*jeu du moulin*, *mérelles*, *marelle*), for two players or one player against the computer.
+*MSEgui* implementation of Nine Men's Morris.
 
-The game logic comes from [Mérelles](https://gitlab.com/rchastain/merelles), a C/SDL program by [Paul-Maxime](https://github.com/paul-maxime/merreles). The rule about taking pieces from mills comes from [Morris](https://nine-mens-morris.net) by Dirk Farin.
+The game logic comes from [Mérelles](https://codeberg.org/rchastain/merelles), a C/SDL program by [paul-maxime](https://github.com/paul-maxime/merreles).
+
+The rule about taking pieces from mills comes from [Morris](https://github.com/farindk/morris) by Dirk Farin.
 
 ## Screenshot
 
@@ -53,16 +56,6 @@ Click a free point to place a piece. To move a piece, drag it to its destination
 
 The status line shows whose turn it is, what to do and how many pieces are left to place.
 
-### Menus
-
-| Menu | Item | Effect |
-|---|---|---|
-| *Partie* | *Nouvelle partie* | Starts a new game (also available as a button). |
-| | *Quitter* | Closes the program. |
-| *Coups* | *Jouer* | The computer plays the current turn, including the removal of a piece after a mill. If *Réponse automatique* is checked, the computer takes over the side to move. |
-| | *Réponse automatique* | When checked, the computer answers each move: it plays the side that is not to move when the option is checked. |
-| *Aide* | *À propos...* | Shows information about the program. |
-
 For now, the computer plays a random legal action: it is only a placeholder for a real opponent (see below).
 
 ## Building
@@ -70,17 +63,26 @@ For now, the computer plays a random legal action: it is only a placeholder for 
 You need Free Pascal and [MSEgui](https://github.com/mse-org/mseide-msegui):
 
 ```Bash
+git clone https://github.com/rchastain2/marelle.git
+cd marelle
+git clone https://github.com/mse-org/mseide-msegui.git --single-branch --depth 1
+make
+```
+
+Or provide the path to an existing MSEgui repository:
+
+```Bash
 make MSEDIR=/path/to/mseide-msegui/
 ```
+
+Or open *marelle.prj* in MSEide.
 
 ## Writing a real computer opponent
 
 Everything is ready for it: only `chooseaction` in `computer.pas` has to be replaced. It receives the game and returns one action for the current phase (`target`: the point to place on, to move to or to take; `source`: the piece to move, used in the moving phase only). The main window calls it repeatedly until the turn is over, so a move that closes a mill is followed by a second call for the removal.
 
-A search (minimax with alpha-beta pruning, for instance) should not work on `tgame` itself: its actions write to the log. A light copy of the position (24 points, side to move, phase, pieces in hand) is better. A long search should also run in a thread, so that the window stays responsive. `LISEZMOI.md` describes all this in detail, with the evaluation criteria and a way to measure the strength of the new player against the random one.
+A search (minimax with alpha-beta pruning, for instance) should not work on `tgame` itself: its actions write to the log. A light copy of the position (24 points, side to move, phase, pieces in hand) is better. A long search should also run in a thread, so that the window stays responsive.
 
 ## Credits
 
-- Board, pieces, marks and icon: images drawn with [AGGPas](https://github.com/graemeg/fpGUI) and saved with *MSEgui* by the programs of the `images` directory (`make` in that directory rebuilds them).
-- Wood texture from [Wood Texture Tiles](https://opengameart.org/content/wood-texture-tiles).
-- Former images, kept in `images/old`: from *Mérelles*.
+- Wood texture from [Wood Texture Tiles](https://opengameart.org/content/wood-texture-tiles)

@@ -1,3 +1,4 @@
+
 program factory;
 
 {$mode objfpc}{$h+}
@@ -35,6 +36,7 @@ begin
     for y := -1 to 1 do
       for z := -1 to 1 do
         cube[x, y, z] := -1;
+  
   count := 0;
   for gy := 1 to 7 do
     for gx := 1 to 7 do

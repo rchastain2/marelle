@@ -1,7 +1,7 @@
 
 ifndef MSEDIR
 MSEDIR := mseide-msegui/
-# git clone https://github.com/mse-org/mseide-msegui.git
+# git clone https://github.com/mse-org/mseide-msegui.git --single-branch --depth 1
 endif
 MSELIBDIR := $(MSEDIR)lib/common/
 
