@@ -98,7 +98,7 @@ object mainfo: tmainfo
         state = [as_localcaption]
       end>
     left = 32
-    top = 24
+    top = 32
   end
   object popupitemframe: tframecomp
     template.framei_left = 6
@@ -108,8 +108,8 @@ object mainfo: tmainfo
     template.extraspace = 4
     template.colorclient = -2147483645
     template.optionsskin = [fso_nomouseanim, fso_noclickanim, fso_nofocusanim]
-    left = 136
-    top = 8
+    left = 192
+    top = 56
   end
   object popupitemframeactive: tframecomp
     template.framewidth = 1
@@ -123,8 +123,8 @@ object mainfo: tmainfo
     template.font.localprops = [flp_color]
     template.extraspace = 4
     template.colorclient = -2147483645
-    left = 136
-    top = 40
+    left = 192
+    top = 88
   end
   object popupframe: tframecomp
     template.framewidth = 1
@@ -133,8 +133,8 @@ object mainfo: tmainfo
     template.framei_top = 2
     template.framei_right = 2
     template.framei_bottom = 2
-    left = 136
-    top = 72
+    left = 192
+    top = 120
   end
   object baritemframe: tframecomp
     template.framei_left = 6
@@ -144,8 +144,8 @@ object mainfo: tmainfo
     template.extraspace = 4
     template.colorclient = -2147483645
     template.optionsskin = [fso_nomouseanim, fso_noclickanim, fso_nofocusanim]
-    left = 136
-    top = 104
+    left = 192
+    top = 152
   end
   object baritemframeactive: tframecomp
     template.framewidth = 1
@@ -159,15 +159,15 @@ object mainfo: tmainfo
     template.font.localprops = [flp_color]
     template.extraspace = 4
     template.colorclient = -2147483645
-    left = 136
-    top = 136
+    left = 192
+    top = 184
   end
   object separatorframe: tframecomp
     template.framei_top = 1
     template.colorclient = 11846872
     template.optionsskin = [fso_flat]
-    left = 136
-    top = 168
+    left = 192
+    top = 216
   end
   object barface: tfacecomp
     template.fade_pos.count = 2
@@ -181,8 +181,8 @@ object mainfo: tmainfo
       13421772
     )
     template.fade_direction = gd_down
-    left = 264
-    top = 8
+    left = 376
+    top = 24
   end
   object activeface: tfacecomp
     template.fade_pos.count = 2
@@ -196,8 +196,8 @@ object mainfo: tmainfo
       12113653
     )
     template.fade_direction = gd_down
-    left = 264
-    top = 40
+    left = 376
+    top = 56
   end
   object popupface: tfacecomp
     template.fade_pos.count = 2
@@ -211,43 +211,43 @@ object mainfo: tmainfo
       15000804
     )
     template.fade_direction = gd_down
-    left = 264
-    top = 72
+    left = 376
+    top = 88
   end
   object newgameact: taction
     caption = '&Nouvelle partie'
     onexecute = newgameev
     left = 32
-    top = 56
+    top = 88
   end
   object playact: taction
     caption = '&Jouer'
     onexecute = playev
     left = 32
-    top = 88
+    top = 120
   end
   object autoplayact: taction
     caption = '&R'#233'ponse automatique'
     statfile = mainstat
     onexecute = autoplayev
     left = 32
-    top = 120
+    top = 152
   end
   object quitact: taction
     caption = '&Quitter'
     onexecute = quitev
     left = 32
-    top = 152
+    top = 184
   end
   object aboutact: taction
     caption = #192' &propos...'
     onexecute = aboutev
     left = 32
-    top = 184
+    top = 216
   end
   object mainstat: tstatfile
     filename = 'marelle.sta'
     left = 32
-    top = 216
+    top = 280
   end
 end

@@ -121,7 +121,7 @@ procedure tmainfo.createev(const sender: TObject);
 var
   dir: filenamety;
 begin
-  writelog('** Marelle, compilé le ' + {$i %date%} + ' avec FPC ' + {$i %fpcversion%}, true);
+  writelog('Marelle, compilé le ' + {$i %date%} + ' avec FPC ' + {$i %fpcversion%}, true);
   dir := filedir(sys_getapplicationpath) + 'images/';
   fplateau := tmaskedbitmap.create(bmk_rgb);
   fplateau.loadfromfile(dir + 'plateau.png');
@@ -136,7 +136,7 @@ begin
   fcapture := tmaskedbitmap.create(bmk_rgb);
   fcapture.loadfromfile(dir + 'prise.png');
   icon.loadfromfile(dir + 'icone48.png');
-  writelog(format('   Barre de menus : %d px, correction de la hauteur : %d px', [container.bounds_y, containerheight - container.bounds_cy]));
+  writelog(format('Hauteur de la barre de menu : %d px, correction : %d px', [container.bounds_y, containerheight - container.bounds_cy]));
   bounds_cy := bounds_cy + containerheight - container.bounds_cy;
   fgame := tgame.create();
   fcomputer := 0;
@@ -146,7 +146,7 @@ end;
 
 procedure tmainfo.destroyev(const sender: TObject);
 begin
-  writelog('** Fin');
+  writelog('Fin');
   fgame.free;
   fplateau.free;
   fpieces[1].free;
@@ -159,9 +159,9 @@ end;
 procedure tmainfo.initgame();
 begin
   fgame.init();
-  writelog('** Nouvelle partie');
+  writelog('Nouvelle partie');
   if fcomputer <> 0 then
-    writelog('   L''ordinateur joue les ' + string(playernames[fcomputer]));
+    writelog('L''ordinateur joue les ' + string(playernames[fcomputer]));
   fselected := -1;
   fdragging := false;
   updatestatus();
@@ -219,7 +219,7 @@ end;
 
 procedure tmainfo.clickpoint(const aindex: integer);
 begin
-  writelog(format('<- Clic sur le point %d', [aindex]));
+  writelog(format('Clic sur le point %d', [aindex]));
   case fgame.phase of
     ph_place:
       fgame.place(aindex);
@@ -227,7 +227,7 @@ begin
       if fgame.points[aindex] = fgame.player then
       begin
         fselected := aindex;
-        writelog(format('   Sélection du pion %d', [aindex]));
+        writelog(format('Sélection du pion %d', [aindex]));
       end
       else
       begin
@@ -249,9 +249,9 @@ begin
     exit;
   fcomputer := aplayer;
   if fcomputer = 0 then
-    writelog('   L''ordinateur ne joue plus')
+    writelog('L''ordinateur ne joue plus')
   else
-    writelog('   L''ordinateur joue les ' + string(playernames[fcomputer]));
+    writelog('L''ordinateur joue les ' + string(playernames[fcomputer]));
   updatestatus();
 end;
 
@@ -294,14 +294,14 @@ begin
   fselected := -1;
   fdragging := false;
   p := fgame.player;
-  writelog('<- Tour de l''ordinateur (' + string(playernames[p]) + ')');
+  writelog('Tour de l''ordinateur (' + string(playernames[p]) + ')');
   done := true;
   while done and (fgame.player = p) and (fgame.phase <> ph_over) do
   begin
     a := chooseaction(fgame);
     if a.target < 0 then
     begin
-      writelog('!! L''ordinateur ne trouve aucune action');
+      writelog('L''ordinateur ne trouve aucune action');
       break;
     end;
     case fgame.phase of
@@ -396,7 +396,7 @@ end;
 
 procedure tmainfo.playev(const sender: TObject);
 begin
-  writelog('** Commande Jouer');
+  writelog('Commande Jouer');
   if fgame.phase = ph_over then
     exit;
   if autoplayact.checked then
@@ -411,43 +411,37 @@ end;
 procedure tmainfo.autoplayev(const sender: TObject);
 begin
   if autoplayact.checked then
-    writelog('** Réponse automatique activée')
+    writelog('Réponse automatique activée')
   else
-    writelog('** Réponse automatique désactivée');
+    writelog('Réponse automatique désactivée');
   updatecomputer();
   checkcomputer();
 end;
 
-
 procedure tmainfo.quitev(const sender: TObject);
 begin
-  writelog('** Commande Quitter');
+  writelog('Commande Quitter');
   close();
 end;
 
-
 procedure tmainfo.aboutev(const sender: TObject);
 begin
-  writelog('** Commande À propos');
+  writelog('Commande À propos');
   showmessage(
     'Marelle' + lineend + lineend +
-    'Jeu du moulin (mérelles) pour deux joueurs, ou contre l''ordinateur.' + lineend + lineend +
-    'Logique du jeu reprise de Mérelles, de Paul-Maxime.' + lineend +
-    'Règle de prise des pions en moulin reprise de Morris, de Dirk Farin.' + lineend +
-    'Images dessinées avec AGGPas ; texture de bois de Wood Texture Tiles.' + lineend + lineend +
+    'Jeu du moulin, ou des mérelles, pour deux joueurs, ou contre l''ordinateur.' + lineend + lineend +
     'Compilé le ' + {$i %date%} + ' avec FPC ' + {$i %fpcversion%} + ' et MSEgui ' + mseguiversiontext + '.',
     'À propos');
 end;
-
 
 procedure tmainfo.statafterreadev(const sender: TObject);
 begin
   if fgame = nil then
     exit;
   if autoplayact.checked then
-    writelog('   Réglages relus : réponse automatique activée')
+    writelog('Réglages relus : réponse automatique activée')
   else
-    writelog('   Réglages relus : réponse automatique désactivée');
+    writelog('Réglages relus : réponse automatique désactivée');
   updatecomputer();
   checkcomputer();
 end;

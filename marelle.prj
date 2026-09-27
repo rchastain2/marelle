@@ -594,7 +594,7 @@ findhistory=0
 findoptions=1
 editpos=2
  0,-1073741823
- 0,0
+ 11,7
 bookmarks0=0
 bookmarks1=0
 sourcefiles=2
@@ -739,7 +739,7 @@ windowlayout=568
  [disassfo]
  splitdir=0
  useroptions=268451947
- stackedunder=mainfo
+ stackedunder=
  parent=
  mdistate=0
  nx=0
@@ -894,10 +894,10 @@ windowlayout=568
  active=0
  visible=1
  [objectinspectorfo.grid]
- propcolwidthref=331
- width0=122
+ propcolwidthref=316
+ width0=117
  sortdescend0=0
- width1=203
+ width1=193
  sortdescend1=0
  [symbolfo]
  splitdir=0
@@ -957,7 +957,7 @@ windowlayout=568
  rcx=0
  rcy=0
  [watchfo.grid]
- propcolwidthref=116
+ propcolwidthref=106
  values0=0
  values0_ci=-1
  sortdescend0=0
@@ -1057,7 +1057,7 @@ windowlayout=568
  [componentpalettefo]
  splitdir=0
  useroptions=268460139
- stackedunder=
+ stackedunder=componentstorefo
  parent=
  mdistate=0
  nx=0
@@ -1115,7 +1115,7 @@ windowlayout=568
  irqoff=0
  splitdir=0
  useroptions=268451947
- stackedunder=componentstorefo
+ stackedunder=mainfo.panel2
  parent=
  mdistate=3
  nx=0
@@ -1153,7 +1153,7 @@ windowlayout=568
  [mainfo.panel2]
  splitdir=2
  useroptions=302022123
- stackedunder=
+ stackedunder=componentpalettefo
  parent=
  mdistate=0
  nx=0

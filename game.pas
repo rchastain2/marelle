@@ -54,25 +54,25 @@ const
 
 const
   lines: array[0..pointcount - 1, 0..3] of integer = (
-    (1, 2, 9, 21), (0, 2, 4, 7), (0, 1, 14, 23),
-    (4, 5, 10, 18), (3, 5, 1, 7), (3, 4, 13, 20),
-    (7, 8, 11, 15), (6, 8, 4, 1), (6, 7, 12, 17),
-    (10, 11, 0, 21), (9, 11, 3, 18), (9, 10, 6, 15),
-    (8, 17, 13, 14), (12, 14, 5, 20), (12, 13, 2, 23),
-    (6, 11, 16, 17), (15, 17, 19, 22), (8, 12, 15, 16),
-    (3, 10, 19, 20), (18, 20, 16, 22), (18, 19, 5, 13),
-    (0, 9, 22, 23), (21, 23, 16, 19), (21, 22, 2, 14)
+    ( 1,  2,  9, 21), ( 0,  2,  4,  7), ( 0,  1, 14, 23),
+    ( 4,  5, 10, 18), ( 3,  5,  1,  7), ( 3,  4, 13, 20),
+    ( 7,  8, 11, 15), ( 6,  8,  4,  1), ( 6,  7, 12, 17),
+    (10, 11,  0, 21), ( 9, 11,  3, 18), ( 9, 10,  6, 15),
+    ( 8, 17, 13, 14), (12, 14,  5, 20), (12, 13,  2, 23),
+    ( 6, 11, 16, 17), (15, 17, 19, 22), ( 8, 12, 15, 16),
+    ( 3, 10, 19, 20), (18, 20, 16, 22), (18, 19,  5, 13),
+    ( 0,  9, 22, 23), (21, 23, 16, 19), (21, 22,  2, 14)
   );
 
   neighbours: array[0..pointcount - 1, 0..3] of integer = (
-    (1, 9, -1, -1), (0, 2, 4, -1), (1, 14, -1, -1),
-    (4, 10, -1, -1), (1, 3, 5, 7), (4, 13, -1, -1),
-    (7, 11, -1, -1), (4, 6, 8, -1), (7, 12, -1, -1),
-    (0, 10, 21, -1), (3, 9, 11, 18), (6, 10, 15, -1),
-    (8, 13, 17, -1), (5, 12, 14, 20), (2, 13, 23, -1),
+    ( 1,  9, -1, -1), ( 0,  2,  4, -1), ( 1, 14, -1, -1),
+    ( 4, 10, -1, -1), ( 1,  3,  5,  7), ( 4, 13, -1, -1),
+    ( 7, 11, -1, -1), ( 4,  6,  8, -1), ( 7, 12, -1, -1),
+    ( 0, 10, 21, -1), ( 3,  9, 11, 18), ( 6, 10, 15, -1),
+    ( 8, 13, 17, -1), ( 5, 12, 14, 20), ( 2, 13, 23, -1),
     (11, 16, -1, -1), (15, 17, 19, -1), (12, 16, -1, -1),
     (10, 19, -1, -1), (16, 18, 20, 22), (13, 19, -1, -1),
-    (9, 22, -1, -1), (19, 21, 23, -1), (14, 22, -1, -1)
+    ( 9, 22, -1, -1), (19, 21, 23, -1), (14, 22, -1, -1)
   );
 
 constructor tgame.create();
@@ -195,18 +195,18 @@ begin
     if (countpieces(fplayer) < 3) or not canmove(fplayer) then
     begin
       if countpieces(fplayer) < 3 then
-        writelog(format('** Les %s n''ont plus que %d pions', [playernames[fplayer], countpieces(fplayer)]))
+        writelog(format('Les %s n''ont plus que %d pions', [playernames[fplayer], countpieces(fplayer)]))
       else
-        writelog(format('** Les %s ne peuvent plus bouger', [playernames[fplayer]]));
+        writelog(format('Les %s ne peuvent plus bouger', [playernames[fplayer]]));
       fwinner := 3 - fplayer;
       fphase := ph_over;
     end;
   end;
-  writelog(format('   Position %s, réserves %d/%d, pions %d/%d', [positionstr(), fhand[1], fhand[2], countpieces(1), countpieces(2)]));
+  writelog(format('Position %s, réserves %d/%d, pions %d/%d', [positionstr(), fhand[1], fhand[2], countpieces(1), countpieces(2)]));
   if fphase = ph_over then
-    writelog(format('** Partie terminée, les %s ont gagné', [playernames[fwinner]]))
+    writelog(format('Partie terminée, les %s ont gagné', [playernames[fwinner]]))
   else
-    writelog(format('   Au tour des %s (%s)', [playernames[fplayer], phasenames[fphase]]));
+    writelog(format('Au tour des %s (%s)', [playernames[fplayer], phasenames[fphase]]));
 end;
 
 function tgame.place(const aindex: integer): boolean;
@@ -214,15 +214,15 @@ begin
   result := (fphase = ph_place) and (fpoints[aindex] = 0);
   if not result then
   begin
-    writelog(format('!! %s : pose en %d refusée', [playernames[fplayer], aindex]));
+    writelog(format('%s : pose en %d refusée', [playernames[fplayer], aindex]));
     exit;
   end;
-  writelog(format('-> %s : pose en %d', [playernames[fplayer], aindex]));
+  writelog(format('%s : pose en %d', [playernames[fplayer], aindex]));
   fpoints[aindex] := fplayer;
   dec(fhand[fplayer]);
   if isinmill(aindex) then
   begin
-    writelog(format('** Moulin des %s en %d', [playernames[fplayer], aindex]));
+    writelog(format('Moulin des %s en %d', [playernames[fplayer], aindex]));
     fphase := ph_remove;
   end
   else
@@ -234,18 +234,18 @@ begin
   result := (fphase = ph_move) and (fpoints[afrom] = fplayer) and maymove(afrom, ato);
   if not result then
   begin
-    writelog(format('!! %s : déplacement %d-%d refusé', [playernames[fplayer], afrom, ato]));
+    writelog(format('%s : déplacement %d-%d refusé', [playernames[fplayer], afrom, ato]));
     exit;
   end;
   if mayjump(fplayer) then
-    writelog(format('-> %s : déplacement %d-%d (3 pions, vol autorisé)', [playernames[fplayer], afrom, ato]))
+    writelog(format('%s : déplacement %d-%d (3 pions, vol autorisé)', [playernames[fplayer], afrom, ato]))
   else
-    writelog(format('-> %s : déplacement %d-%d', [playernames[fplayer], afrom, ato]));
+    writelog(format('%s : déplacement %d-%d', [playernames[fplayer], afrom, ato]));
   fpoints[ato] := fplayer;
   fpoints[afrom] := 0;
   if isinmill(ato) then
   begin
-    writelog(format('** Moulin des %s en %d', [playernames[fplayer], ato]));
+    writelog(format('Moulin des %s en %d', [playernames[fplayer], ato]));
     fphase := ph_remove;
   end
   else
@@ -257,10 +257,10 @@ begin
   result := (fphase = ph_remove) and maytake(aindex);
   if not result then
   begin
-    writelog(format('!! %s : prise en %d refusée', [playernames[fplayer], aindex]));
+    writelog(format('%s : prise en %d refusée', [playernames[fplayer], aindex]));
     exit;
   end;
-  writelog(format('-> %s : prise en %d', [playernames[fplayer], aindex]));
+  writelog(format('%s : prise en %d', [playernames[fplayer], aindex]));
   fpoints[aindex] := 0;
   endturn();
 end;
