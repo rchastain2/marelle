@@ -1,9 +1,14 @@
 
+marelle
+
 *.bak
 *.bak?
+*.desktop
+*.exe
 *.log
 *.o
 *.ppu
+*.sta
 
 mseide-msegui/
 

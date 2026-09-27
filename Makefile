@@ -16,15 +16,13 @@ PC = fpc
 PFLAGS := -Mobjfpc -Sh
 PFLAGS += -Fu$(MSELIBDIR)*
 PFLAGS += -Fu$(MSELIBDIR)kernel/$(OS)
+PFLAGS += -CX -Xs -XX -O2
 
 SOURCES := $(wildcard *.pas)
 PROGRAM := marelle
 
 $(PROGRAM): $(PROGRAM).pas $(SOURCES)
 	@$(PC) $(PFLAGS) $<
-
-main_mfm.pas: main.mfm
-	@../tools/mfm2pas/mfm2pas $<
 
 marelle.desktop:
 	@printf '%s\n' '[Desktop Entry]' 'Type=Application' 'Name=Marelle' \
@@ -41,4 +39,4 @@ clean:
 	@rm -rfv units
 
 distclean: clean
-	@rm -fv marelle.desktop *.sta $(PROGRAM) $(PROGRAM).dbg $(PROGRAM).exe
+	@rm -fv $(PROGRAM) $(PROGRAM).dbg $(PROGRAM).exe
