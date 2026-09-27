@@ -1,6 +1,6 @@
 unit game;
 
-{$mode objfpc}{$h+}
+{$mode objfpc}{$h+}{$codepage utf8}
 
 interface
 
@@ -18,11 +18,14 @@ type
     fphase: phasety;
     fhand: array[1..2] of integer;
     fwinner: integer;
+    fquiet: boolean;
+    procedure writelog(const aline: string);
     procedure endturn();
     function getpoint(const aindex: integer): integer;
     function gethand(const aplayer: integer): integer;
   public
     constructor create();
+    constructor createcopy(const asource: tgame);
     procedure init();
     function place(const aindex: integer): boolean;
     function move(const afrom, ato: integer): boolean;
@@ -79,6 +82,23 @@ constructor tgame.create();
 begin
   inherited create();
   init();
+end;
+
+constructor tgame.createcopy(const asource: tgame);
+begin
+  inherited create();
+  fpoints := asource.fpoints;
+  fplayer := asource.fplayer;
+  fphase := asource.fphase;
+  fhand := asource.fhand;
+  fwinner := asource.fwinner;
+  fquiet := true;
+end;
+
+procedure tgame.writelog(const aline: string);
+begin
+  if not fquiet then
+    log.writelog(aline);
 end;
 
 procedure tgame.init();

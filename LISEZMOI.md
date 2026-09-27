@@ -65,63 +65,77 @@ Le programme du dossier `factory` calcule ainsi les tables `neighbours` et `line
 
 ## Implémenter un adversaire artificiel
 
-Le programme est prêt à recevoir un vrai adversaire : il suffit de remplacer la fonction `chooseaction` de `computer.pas`. Le reste (menus, déclenchement, enchaînement du tour, journal) n'a pas à changer.
+Le programme est prêt à recevoir un vrai adversaire : il suffit de remplacer la fonction `chooseturn` de `computer.pas`. Le reste (menus, thread de calcul, enchaînement du tour, journal) n'a pas à changer.
 
-### Le contrat de `chooseaction`
+### Le contrat de `chooseturn`
 
 ```pascal
 type
-  computeractionty = record
+  computerturnty = record
     source: integer;
     target: integer;
+    capture: integer;
   end;
 
-function chooseaction(const agame: tgame): computeractionty;
+function chooseturn(const agame: tgame): computerturnty;
 ```
 
-La fonction reçoit la partie et renvoie **une seule action**, pour la phase en cours :
+La fonction reçoit une copie de la partie et renvoie **le tour complet** de l'ordinateur :
 
-| Phase | `source` | `target` |
-|---|---|---|
-| `ph_place` | inutilisé (-1) | point libre où poser |
-| `ph_move` | pion à déplacer | point d'arrivée |
-| `ph_remove` | inutilisé (-1) | pion adverse à prendre |
+| Phase au début du tour | `source` | `target` | `capture` |
+|---|---|---|---|
+| `ph_place` | inutilisé (-1) | point libre où poser | pion à prendre si la pose ferme un moulin, sinon -1 |
+| `ph_move` | pion à déplacer | point d'arrivée | pion à prendre si le déplacement ferme un moulin, sinon -1 |
+| `ph_remove` | inutilisé (-1) | pion adverse à prendre | inutilisé (-1) |
 
-`playturn` (dans `main.pas`) l'appelle en boucle tant que le joueur n'a pas changé : un coup qui ferme un moulin est donc suivi d'un second appel, en phase `ph_remove`, pour la prise. Deux conséquences :
+La phase `ph_remove` au début du tour se présente quand le joueur, après avoir fermé un moulin, demande « Jouer » : l'ordinateur ne choisit alors que la prise.
 
-- l'action renvoyée doit être **légale**. Une action refusée par `tgame` arrête la boucle, et le tour de l'ordinateur reste inachevé : la souris est alors bloquée, puisque c'est toujours à l'ordinateur de jouer ;
+Quelques règles :
+
+- la copie appartient au thread : `chooseturn` peut y jouer des coups, comme le fait l'adversaire actuel ;
+- les actions renvoyées doivent être **légales**. Une action refusée par `tgame` laisse le tour inachevé ; en réponse automatique, l'ordinateur relance alors son calcul, ce qui peut tourner en rond ;
 - `target = -1` signifie « aucune action possible ». Cela ne devrait pas arriver, puisque la partie se termine dès qu'un joueur ne peut plus bouger.
 
-Un moteur qui calcule un coup complet (déplacement et prise) doit donc garder la prise en mémoire entre les deux appels, ou la recalculer au second appel.
+La fonction `chooseaction`, qui choisit une seule action au hasard, sert à `chooseturn` et au programme de test.
 
 ### Ce que `tgame` met à disposition
 
 En lecture : `points[i]` (0, 1 ou 2), `player`, `phase`, `hand[joueur]`, `winner`, et les fonctions `maymove`, `maytake`, `isinmill`, `countpieces`, `canmove`, `mayjump`, `positionstr`.
 
+Le constructeur `createcopy` crée une copie **silencieuse** de la partie : ses actions n'écrivent pas dans le journal. C'est une copie de ce genre que reçoit `chooseturn`.
+
 Deux limites à connaître :
 
-- **Les actions de `tgame` écrivent dans le journal.** Une recherche qui jouerait et déjouerait des coups sur `tgame` remplirait `marelle.log` de milliers de lignes, et serait très lente, puisque chaque ligne ouvre et referme le fichier. `tgame` ne sait d'ailleurs pas annuler un coup.
+- **`tgame` ne sait pas annuler un coup.** Une recherche doit donc créer une copie par position explorée, ce qui reste lent pour une recherche profonde.
 - **Les tables `neighbours` et `lines` sont privées** : elles sont déclarées dans la partie `implementation` de `game.pas`.
 
-Il vaut donc mieux que le moteur ait **sa propre représentation**, légère et sans journal : les 24 points, le joueur qui a le trait, la phase, les réserves. Pour les tables, on peut les déplacer dans la partie `interface` de `game.pas`, ou inclure celles que produit `factory` (`make tables.inc`).
+Pour une recherche sérieuse, il vaut donc mieux que le moteur ait **sa propre représentation**, légère : les 24 points, le joueur qui a le trait, la phase, les réserves. Pour les tables, on peut les déplacer dans la partie `interface` de `game.pas`, ou inclure celles que produit `factory` (`make tables.inc`).
 
 Sans recherche, on obtient déjà un adversaire nettement meilleur que le hasard :
 
 - **pose et déplacement** : fermer un moulin si c'est possible ; sinon empêcher l'adversaire de fermer le sien au coup suivant ; sinon préparer un moulin (deux pions alignés avec une case libre) ; sinon jouer au hasard ;
 - **prise** : retirer de préférence un pion qui menace de fermer un moulin, ou qui en bloque un.
 
-### Garder la fenêtre réactive
+### Le thread de calcul
 
-`playturn` s'exécute dans le fil principal : pendant qu'il calcule, la fenêtre ne se redessine plus et ne répond plus. Pour une recherche de plus d'une fraction de seconde :
+Le calcul se fait dans un thread, défini dans `computerthread.pas`, pour que la fenêtre reste réactive :
 
-- lancer la recherche dans un `tthread` ;
-- afficher « L'ordinateur réfléchit... » dans la ligne d'état ;
-- à la fin du calcul, transmettre le coup au fil principal par un événement asynchrone (`asyncevent`, comme le fait déjà `checkcomputer`), qui le joue avec `tgame`.
+1. `startthinking` (dans `main.pas`) crée le thread avec une copie silencieuse de la partie. La ligne d'état affiche « L'ordinateur réfléchit... », et les clics sur le plateau et la commande « Jouer » sont ignorés ;
+2. le thread appelle `chooseturn`, puis prévient la fenêtre par un événement asynchrone ;
+3. `finishturn` joue le tour dans le fil principal, avec `tgame`, ce qui l'écrit dans le journal.
 
-Les clics sont déjà ignorés pendant le tour de l'ordinateur (`mouseev` teste `fcomputer = fgame.player`). Il faudra en plus désactiver « Jouer » et « Nouvelle partie » pendant le calcul, ou savoir interrompre la recherche.
+Une nouvelle partie, un changement de la réponse automatique ou la fermeture de la fenêtre interrompent le calcul (`stopthinking`) : le thread est prévenu par `terminate`, et la fenêtre attend sa fin.
+
+Trois points à respecter dans le moteur :
+
+- **ne pas écrire dans le journal** : `writelog` n'est pas prévu pour être appelé depuis plusieurs threads ;
+- **ne toucher ni à la fenêtre, ni à la vraie partie** : tout passe par la copie reçue et par le résultat renvoyé ;
+- **savoir s'interrompre** : une longue recherche doit tester régulièrement `terminated`, sans quoi la fenêtre reste bloquée jusqu'à la fin du calcul quand on l'interrompt. Il faudra pour cela passer le thread (ou un indicateur d'arrêt) à `chooseturn`.
+
+La constante `thinkingdelay` de `computerthread.pas` ajoute une pause artificielle avant le calcul, utile pour voir le thread à l'œuvre ; on la mettra à 0 une fois le vrai adversaire en place.
 
 ### Mesurer la force du nouvel adversaire
 
-Le dossier `test` contient `logtest`, qui fait jouer une partie entière à l'ordinateur contre lui-même, avec une graine du hasard fixe. Sur ce modèle, un programme de match peut faire jouer le nouvel adversaire contre l'ancien (le hasard) sur une centaine de parties, en alternant les couleurs, et compter les victoires, les défaites et les parties arrêtées au bout d'un nombre maximal de coups. Pour que ce soit rapide, il faudra pouvoir couper l'écriture du journal (par exemple avec une variable de `log.pas`).
+Le dossier `test` contient `logtest`, qui fait jouer une partie entière à l'ordinateur contre lui-même, avec une graine du hasard fixe. Sur ce modèle, un programme de match peut faire jouer le nouvel adversaire contre l'ancien (le hasard) sur une centaine de parties, en alternant les couleurs, et compter les victoires, les défaites et les parties arrêtées au bout d'un nombre maximal de coups. Pour que ce soit rapide, il suffit de jouer ces parties sur une copie silencieuse (`createcopy`), qui n'écrit pas dans le journal.
 
 Avec la graine fixe, `logtest.log` sert aussi de référence : un `diff` entre deux versions (en ignorant l'horodatage, par exemple avec `cut -c14-`) montre tout de suite si le déroulement d'une partie a changé.

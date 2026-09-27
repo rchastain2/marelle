@@ -25,9 +25,11 @@ uses
   mseactions,
   game,
   computer,
+  computerthread,
   log;
 
 const
+  appversion = '1.0';
   cellsize = 64;
   piecesize = 48;
   containerheight = 562;
@@ -75,6 +77,7 @@ type
     fdragoffset: pointty;
     fdragpos: pointty;
     fcomputer: integer;
+    fthread: tcomputerthread;
     procedure initgame();
     procedure updatestatus();
     procedure clickpoint(const aindex: integer);
@@ -82,7 +85,9 @@ type
     procedure setcomputer(const aplayer: integer);
     procedure updatecomputer();
     function playerlabel(const aplayer: integer): msestring;
-    procedure playturn();
+    procedure startthinking();
+    procedure finishturn();
+    procedure stopthinking();
     function pointcenter(const aindex: integer): pointty;
     procedure paintcentered(const acanvas: tcanvas; const abitmap: tmaskedbitmap; const acenter: pointty);
     function pointatpos(const apos: pointty): integer;
@@ -117,11 +122,14 @@ const
 
   playernames: array[1..2] of msestring = ('Blancs', 'Noirs');
 
+  tag_startturn = 0;
+  tag_turnready = 1;
+
 procedure tmainfo.createev(const sender: TObject);
 var
   dir: filenamety;
 begin
-  writelog('Marelle, compilé le ' + {$i %date%} + ' avec FPC ' + {$i %fpcversion%}, true);
+  writelog('Marelle ' + appversion + ', compilé le ' + {$i %date%} + ' avec FPC ' + {$i %fpcversion%}, true);
   dir := filedir(sys_getapplicationpath) + 'images/';
   fplateau := tmaskedbitmap.create(bmk_rgb);
   fplateau.loadfromfile(dir + 'plateau.png');
@@ -147,6 +155,7 @@ end;
 procedure tmainfo.destroyev(const sender: TObject);
 begin
   writelog('Fin');
+  stopthinking();
   fgame.free;
   fplateau.free;
   fpieces[1].free;
@@ -158,6 +167,7 @@ end;
 
 procedure tmainfo.initgame();
 begin
+  stopthinking();
   fgame.init();
   writelog('Nouvelle partie');
   if fcomputer <> 0 then
@@ -175,21 +185,24 @@ var
   p: msestring;
 begin
   p := playerlabel(fgame.player);
-  case fgame.phase of
-    ph_place:
-      s := p + ' : placez un pion (' + inttostrmse(fgame.hand[fgame.player]) + ' en réserve)';
-    ph_move:
-      if fselected < 0 then
-        s := p + ' : choisissez un pion à déplacer'
-      else
-        s := p + ' : choisissez la destination';
-    ph_remove:
-      s := p + ' : enlevez un pion adverse';
-    ph_over:
-      s := 'Partie terminée. Les ' + playerlabel(fgame.winner) + ' ont gagné !';
-  end;
+  if fthread <> nil then
+    s := p + ' : l''ordinateur réfléchit...'
+  else
+    case fgame.phase of
+      ph_place:
+        s := p + ' : placez un pion (' + inttostrmse(fgame.hand[fgame.player]) + ' en réserve)';
+      ph_move:
+        if fselected < 0 then
+          s := p + ' : choisissez un pion à déplacer'
+        else
+          s := p + ' : choisissez la destination';
+      ph_remove:
+        s := p + ' : enlevez un pion adverse';
+      ph_over:
+        s := 'Partie terminée. Les ' + playerlabel(fgame.winner) + ' ont gagné !';
+    end;
   statuslb.caption := s;
-  playact.enabled := fgame.phase <> ph_over;
+  playact.enabled := (fgame.phase <> ph_over) and (fthread = nil);
 end;
 
 function tmainfo.pointcenter(const aindex: integer): pointty;
@@ -247,6 +260,7 @@ procedure tmainfo.setcomputer(const aplayer: integer);
 begin
   if aplayer = fcomputer then
     exit;
+  stopthinking();
   fcomputer := aplayer;
   if fcomputer = 0 then
     writelog('L''ordinateur ne joue plus')
@@ -281,40 +295,60 @@ end;
 procedure tmainfo.doasyncevent(var atag: integer);
 begin
   inherited;
-  if (fcomputer = fgame.player) and (fgame.phase <> ph_over) then
-    playturn();
+  case atag of
+    tag_startturn:
+      if (fthread = nil) and (fcomputer = fgame.player) and (fgame.phase <> ph_over) then
+        startthinking();
+    tag_turnready:
+      finishturn();
+  end;
 end;
 
-procedure tmainfo.playturn();
-var
-  p: integer;
-  a: computeractionty;
-  done: boolean;
+procedure tmainfo.startthinking();
 begin
   fselected := -1;
   fdragging := false;
-  p := fgame.player;
-  writelog('Tour de l''ordinateur (' + string(playernames[p]) + ')');
-  done := true;
-  while done and (fgame.player = p) and (fgame.phase <> ph_over) do
-  begin
-    a := chooseaction(fgame);
-    if a.target < 0 then
-    begin
-      writelog('L''ordinateur ne trouve aucune action');
-      break;
-    end;
-    case fgame.phase of
-      ph_place:
-        done := fgame.place(a.target);
-      ph_move:
-        done := fgame.move(a.source, a.target);
-      ph_remove:
-        done := fgame.remove(a.target);
-    end;
-  end;
+  writelog('Tour de l''ordinateur (' + string(playernames[fgame.player]) + ')');
+  fthread := tcomputerthread.create(fgame, self, tag_turnready);
   updatestatus();
   board.invalidate();
+end;
+
+procedure tmainfo.finishturn();
+var
+  t: computerturnty;
+begin
+  if (fthread = nil) or not fthread.done then
+    exit;
+  t := fthread.turn;
+  application.waitforthread(fthread);
+  freeandnil(fthread);
+  if t.target < 0 then
+    writelog('L''ordinateur ne trouve aucune action')
+  else
+    case fgame.phase of
+      ph_place:
+        fgame.place(t.target);
+      ph_move:
+        fgame.move(t.source, t.target);
+      ph_remove:
+        fgame.remove(t.target);
+    end;
+  if (fgame.phase = ph_remove) and (t.capture >= 0) then
+    fgame.remove(t.capture);
+  updatestatus();
+  board.invalidate();
+  checkcomputer();
+end;
+
+procedure tmainfo.stopthinking();
+begin
+  if fthread = nil then
+    exit;
+  writelog('Calcul de l''ordinateur interrompu');
+  fthread.terminate();
+  application.waitforthread(fthread);
+  freeandnil(fthread);
 end;
 
 procedure tmainfo.paintev(const sender: twidget; const acanvas: tcanvas);
@@ -343,7 +377,7 @@ procedure tmainfo.mouseev(const sender: twidget; var ainfo: mouseeventinfoty);
 var
   i: integer;
 begin
-  if (fgame.phase = ph_over) or (fcomputer = fgame.player) then
+  if (fgame.phase = ph_over) or (fcomputer = fgame.player) or (fthread <> nil) then
     exit;
   case ainfo.eventkind of
     ek_buttonpress:
@@ -397,7 +431,7 @@ end;
 procedure tmainfo.playev(const sender: TObject);
 begin
   writelog('Commande Jouer');
-  if fgame.phase = ph_over then
+  if (fgame.phase = ph_over) or (fthread <> nil) then
     exit;
   if autoplayact.checked then
   begin
@@ -405,7 +439,7 @@ begin
     checkcomputer();
   end
   else
-    playturn();
+    startthinking();
 end;
 
 procedure tmainfo.autoplayev(const sender: TObject);
@@ -428,7 +462,7 @@ procedure tmainfo.aboutev(const sender: TObject);
 begin
   writelog('Commande À propos');
   showmessage(
-    'Marelle' + lineend + lineend +
+    'Marelle ' + appversion + lineend + lineend +
     'Jeu du moulin, ou des mérelles, pour deux joueurs, ou contre l''ordinateur.' + lineend + lineend +
     'Compilé le ' + {$i %date%} + ' avec FPC ' + {$i %fpcversion%} + ' et MSEgui ' + mseguiversiontext + '.',
     'À propos');

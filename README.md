@@ -56,7 +56,7 @@ Click a free point to place a piece. To move a piece, drag it to its destination
 
 The status line shows whose turn it is, what to do and how many pieces are left to place.
 
-For now, the computer plays a random legal action: it is only a placeholder for a real opponent (see below).
+For now, the computer plays a random legal action: it is only a placeholder for a real opponent.
 
 ## Building
 
@@ -76,12 +76,6 @@ make MSEDIR=/path/to/mseide-msegui/
 ```
 
 Or open *marelle.prj* in MSEide.
-
-## Writing a real computer opponent
-
-Everything is ready for it: only `chooseaction` in `computer.pas` has to be replaced. It receives the game and returns one action for the current phase (`target`: the point to place on, to move to or to take; `source`: the piece to move, used in the moving phase only). The main window calls it repeatedly until the turn is over, so a move that closes a mill is followed by a second call for the removal.
-
-A search (minimax with alpha-beta pruning, for instance) should not work on `tgame` itself: its actions write to the log. A light copy of the position (24 points, side to move, phase, pieces in hand) is better. A long search should also run in a thread, so that the window stays responsive.
 
 ## Credits
 

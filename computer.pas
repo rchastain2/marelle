@@ -13,7 +13,14 @@ type
     target: integer;
   end;
 
+  computerturnty = record
+    source: integer;
+    target: integer;
+    capture: integer;
+  end;
+
 function chooseaction(const agame: tgame): computeractionty;
+function chooseturn(const agame: tgame): computerturnty;
 
 implementation
 
@@ -56,6 +63,28 @@ begin
   end
   else
     result := candidates[random(count)];
+end;
+
+function chooseturn(const agame: tgame): computerturnty;
+var
+  a: computeractionty;
+  p: integer;
+begin
+  p := agame.player;
+  a := chooseaction(agame);
+  result.source := a.source;
+  result.target := a.target;
+  result.capture := -1;
+  if a.target < 0 then
+    exit;
+  case agame.phase of
+    ph_place:
+      agame.place(a.target);
+    ph_move:
+      agame.move(a.source, a.target);
+  end;
+  if (agame.phase = ph_remove) and (agame.player = p) then
+    result.capture := chooseaction(agame).target;
 end;
 
 initialization
