@@ -73,14 +73,6 @@ You need Free Pascal and [MSEgui](https://github.com/mse-org/mseide-msegui):
 make MSEDIR=/path/to/mseide-msegui/
 ```
 
-After editing `main.mfm` by hand, regenerate `main_mfm.pas` with [mfm2pas](../tools/mfm2pas):
-
-```Bash
-make main_mfm.pas
-```
-
-The images are already built. To rebuild them, run `make` in the `images` directory: it also needs [AGGPas](https://github.com/graemeg/fpGUI), found through the `FPGUI` variable (the root of the fpGUI sources).
-
 ## Writing a real computer opponent
 
 Everything is ready for it: only `chooseaction` in `computer.pas` has to be replaced. It receives the game and returns one action for the current phase (`target`: the point to place on, to move to or to take; `source`: the piece to move, used in the moving phase only). The main window calls it repeatedly until the turn is over, so a move that closes a mill is followed by a second call for the removal.
